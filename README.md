@@ -1,5 +1,5 @@
-Role Name
-=========
+ansible_setup
+=============
 
 Setup prereqs for Ansible, e.g. create ansible user and groups and setup ssh keys.
 
@@ -24,7 +24,7 @@ Role Variables
 
 ```
 | Variable                          | Description                                                       | Default                                 |
-| --------                          | -----------                                                       | -------                                 |
+|-----------------------------------|-------------------------------------------------------------------|-----------------------------------------|
 | ansible_setup_keygen_passphrase   | (required) Passphrase for ansible user's ssh key                  | ''                                      |
 | ansible_setup_keygen_filename     | The filename in which to place the ansible user's ssh private key | '/home/ansible/.ssh/ansible_id_rsa'     |
 | ansible_setup_keygen_filename_pub | The filename in which to place the ansible user's ssh public key  | '/home/ansible/.ssh/ansible_id_rsa.pub' |
