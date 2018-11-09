@@ -40,7 +40,7 @@ Dependencies
 
 Example Playbook
 ----------------
-
+```
   - hosts: control-nodes
     gather_facts: false 
 
@@ -63,7 +63,7 @@ Example Playbook
         - name: "Include ansible_setup role for managed nodes"
           include_role:
             name: ansible_setup
-
+```
         
 License
 -------
