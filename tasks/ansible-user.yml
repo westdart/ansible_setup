@@ -1,0 +1,21 @@
+---
+- name: "Create {{ ansible_setup_ansible_group }} group"
+  group:
+    name: "{{ ansible_setup_ansible_group }}"
+    state: present
+    gid: "{{ ansible_setup_ansible_group_id }}"
+
+- name: "Create {{ ansible_setup_ansible_user }} user"
+  user:
+    name: "{{ ansible_setup_ansible_user }}"
+    state: present
+    uid: "{{ ansible_setup_ansible_user_id }}"
+    group: "{{ ansible_setup_ansible_group }}"
+
+- name: "Add {{ ansible_setup_ansible_user }} .ssh directory"
+  file:
+    path: /home/{{ ansible_setup_ansible_user }}/.ssh
+    state: directory
+    mode: 0700
+    owner: "{{ ansible_setup_ansible_user }}"
+    group: "{{ ansible_setup_ansible_group }}"

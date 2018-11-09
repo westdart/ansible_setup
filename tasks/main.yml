@@ -1,0 +1,2 @@
+---
+- import_tasks: managed-node.yml

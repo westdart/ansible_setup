@@ -1,0 +1,48 @@
+---
+- name: "Get the managed server's ({{ inventory_hostname }}) ssh key"
+  shell: "ssh-keyscan {{ inventory_hostname }} | awk '{print $3}'"
+  register: known_host_key
+  changed_when: false
+  failed_when: known_host_key.stdout == ''
+  delegate_to: localhost
+
+- name: "Check the managed server's ({{ inventory_hostname }}) ssh key does not already exist"
+  command : grep "{{ inventory_hostname }}.*{{ known_host_key.stdout }}" {{ ansible_setup_keygen_known_hosts }}
+  register: known_host_key_exists
+  changed_when: false
+  failed_when: false
+  delegate_to: localhost
+
+- name: "Add the managed server ({{ inventory_hostname }}) to the ansible known hosts"
+  shell : echo "{{ inventory_hostname }} ssh-rsa {{ known_host_key.stdout }}" >> {{ ansible_setup_keygen_known_hosts }}
+  when: known_host_key_exists.rc != 0
+  delegate_to: localhost
+
+- name: "Add the managed server ({{ inventory_hostname }}) to the root known hosts"
+  shell : echo "{{ inventory_hostname }} ssh-rsa {{ known_host_key.stdout }}" >> /root/.ssh/known_hosts
+  when: known_host_key_exists.rc != 0
+  delegate_to: localhost
+
+- name: "Change {{ ansible_setup_ansible_user }} user's known_hosts file ownership"
+  file:
+    path: "{{ ansible_setup_keygen_known_hosts }}"
+    owner: "{{ ansible_setup_ansible_user }}"
+    group: "{{ ansible_setup_ansible_group }}"
+  delegate_to: localhost
+
+- import_tasks: ansible-user.yml
+
+- name: "Ensure authorized_keys is present and contains {{ ansible_setup_ansible_user }}'s key"
+  authorized_key:
+    user: "{{ ansible_setup_ansible_user }}"
+    state: present
+    manage_dir: true
+    key: "{{ lookup('file', ansible_setup_keygen_filename_pub) }}"
+
+- name: "add {{ ansible_setup_ansible_user }} to sudoers"
+  copy:
+    content: "{{ ansible_setup_ansible_user }}   ALL=(ALL)   NOPASSWD: ALL"
+    dest: "/etc/sudoers.d/{{ ansible_setup_ansible_user }}"
+    mode: 0440
+    owner: root
+    group: root

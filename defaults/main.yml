@@ -1,0 +1,11 @@
+---
+ansible_setup_ansible_user: 'ansible'
+ansible_setup_ansible_group: 'ansible'
+ansible_setup_ansible_user_id: '2002'
+ansible_setup_ansible_group_id: '2002'
+ansible_setup_keygen_passphrase: ''
+
+# The following should not be changed
+ansible_setup_keygen_filename: "/home/{{ ansible_setup_ansible_user }}/.ssh/{{ ansible_setup_ansible_user }}_id_rsa"
+ansible_setup_keygen_filename_pub: '/home/{{ ansible_setup_ansible_user }}/.ssh/{{ ansible_setup_ansible_user }}_id_rsa.pub'
+ansible_setup_keygen_known_hosts:  '/home/{{ ansible_setup_ansible_user }}/.ssh/known_hosts'

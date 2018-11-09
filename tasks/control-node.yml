@@ -1,0 +1,36 @@
+---
+- name: "Assert that ansible_setup_keygen_passphrase is provided"
+  assert:
+    that:
+      - "ansible_setup_keygen_passphrase != ''"
+
+- import_tasks: ansible-user.yml
+  delegate_to: localhost
+
+- name: "Generate /home/{{ ansible_setup_ansible_user }}/.ssh RSA host key"
+  command : ssh-keygen -q -t rsa -f {{ ansible_setup_keygen_filename }} -C "{{ ansible_setup_ansible_user }}@{{ ansible_host }}" -N "{{ ansible_setup_keygen_passphrase }}"
+  args:
+    creates: "{{ ansible_setup_keygen_filename }}"
+  delegate_to: localhost
+
+- name: "Change {{ ansible_setup_ansible_user }} user's private key file ownership"
+  file:
+    path: "{{ ansible_setup_keygen_filename }}"
+    owner: "{{ ansible_setup_ansible_user }}"
+    group: "{{ ansible_setup_ansible_group }}"
+  delegate_to: localhost
+
+- name: "Change {{ ansible_setup_ansible_user }} user's public key file ownership"
+  file:
+    path: "{{ ansible_setup_keygen_filename_pub }}"
+    owner: "{{ ansible_setup_ansible_user }}"
+    group: "{{ ansible_setup_ansible_group }}"
+  delegate_to: localhost
+
+- name: "Ensure {{ ansible_setup_ansible_user }} user can ssh to localhost as itself"
+  authorized_key:
+    user: "{{ ansible_setup_ansible_user }}"
+    state: present
+    manage_dir: true
+    key: "{{ lookup('file', ansible_setup_keygen_filename_pub) }}"
+  delegate_to: localhost
